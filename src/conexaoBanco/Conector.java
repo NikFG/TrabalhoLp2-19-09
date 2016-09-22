@@ -18,21 +18,19 @@ public class Conector {
     private static final String DRIVER_PADRAO_MYSQL = "com.mysql.jdbc.Driver";
     private static final String URL_PADRAO_MYSQL = "jdbc:mysql://localhost:3306/"; //para ser concatenada com o nome do banco
 
-    public Conector(String driver, String url, String nomeBanco, String usuario, String senha, Menu menu) {
+    public Conector(String driver, String url, String nomeBanco, String usuario, String senha) {
         try {
             String urlFinal = url + nomeBanco;
             Class.forName(driver);
             this.conexao = DriverManager.getConnection(urlFinal, usuario, senha);
-            menu.AlteraTexto();
-            System.out.println("Conexão com o banco feita com sucesso!");
 
         } catch (ClassNotFoundException | SQLException e) {
             System.err.println(e);
         }
     }
 
-    public Conector(String nomeBanco, String usuario, String senha, Menu menu) {
-        this(DRIVER_PADRAO_MYSQL, URL_PADRAO_MYSQL, nomeBanco, usuario, senha, menu);
+    public Conector(String nomeBanco, String usuario, String senha) {
+        this(DRIVER_PADRAO_MYSQL, URL_PADRAO_MYSQL, nomeBanco, usuario, senha);
     }
 
     public void fecharResultSet(ResultSet rs) {

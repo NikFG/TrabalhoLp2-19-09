@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -19,6 +21,8 @@ import javax.swing.JFileChooser;
  * @author nikol
  */
 public class Menu extends javax.swing.JFrame {
+
+    Conector conector;
 
     /**
      * Creates new form Menu
@@ -320,7 +324,7 @@ public class Menu extends javax.swing.JFrame {
         menuVars.setNomebd(CampoNomeBd.getText());
         menuVars.setUsuario(CampoUsuario.getText());
         menuVars.setSenha(CampoSenha.getText());
-        Conector conector = new Conector(menuVars.getDrive(), menuVars.getUrl(), menuVars.getNomebd(), menuVars.getUsuario(), menuVars.getSenha(), this);
+        conector = new Conector(menuVars.getDrive(), menuVars.getUrl(), menuVars.getNomebd(), menuVars.getUsuario(), menuVars.getSenha());
     }//GEN-LAST:event_BtnConectarMouseClicked
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
@@ -333,16 +337,39 @@ public class Menu extends javax.swing.JFrame {
 
     private void btn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn1ActionPerformed
         String[] teste;
+
         Texto1.setText("");
-        try {
-            String tt = leArquivo();
-            Texto1.setText(tt);
-            teste = tt.split("\\s+\\s+");            
-                System.out.println(teste[0]);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        JFileChooser abre = new JFileChooser();
+        int option = abre.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            String conteudo;
+            int cont = 0;
+            try (BufferedReader bffReader = new BufferedReader(new FileReader(abre.getSelectedFile()))) {
+                while (bffReader.ready()) {
+                    conteudo = bffReader.readLine();
+                    Texto1.append(conteudo + "\n");
+                    teste = conteudo.split("\t");
+                    ModelCidade cidade = new ModelCidade();                   
+                    cont++;
+                    if (teste[0].contains(String.valueOf(cont))) {
+
+                        cidade.setNome(teste[1]);
+                        cidade.setCodigoIBGE(Integer.parseInt(teste[2].trim()));
+                        cidade.setFkEstado(Integer.parseInt(teste[2].substring(0, 2)));
+                        TextoSql.append(cidade.toString() + "\n");
+                        DaoCidade daoCidade = new DaoCidade(conector.getConexao());
+                        daoCidade.inserir(cidade);
+                        //conn = DriverManager();
+                    }
+
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+
     }//GEN-LAST:event_btn1ActionPerformed
 
     /**
@@ -393,22 +420,6 @@ public class Menu extends javax.swing.JFrame {
         OnOff.setText("On");
     }
 
-    public String leArquivo() throws FileNotFoundException, IOException {
-        JFileChooser abre = new JFileChooser();
-        int option = abre.showOpenDialog(this);
-        if (option == JFileChooser.APPROVE_OPTION) {
-            String conteudo = "";
-            try (BufferedReader bffReader = new BufferedReader(new FileReader(abre.getSelectedFile()))) {
-                while (bffReader.ready()) {
-                    conteudo += bffReader.readLine() + "\n";
-                }
-            }
-            conteudo = conteudo.replaceAll("\"", " ");
-            return conteudo;
-        } else {
-            return null;
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnConectar;
