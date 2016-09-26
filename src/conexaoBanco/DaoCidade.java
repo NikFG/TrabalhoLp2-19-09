@@ -24,13 +24,13 @@ public class DaoCidade {
     }
 
     public int inserir(ModelCidade cidade) throws SQLException {
-        String SQL = "insert into cidades values(?,?,?)";
+        String SQL = "insert into cidades(nome,codigoIBGE,fkEstado) values(?,?,?)";
         int r;
         try (PreparedStatement ps = conn.prepareStatement(SQL)) {
-            ps.setInt(1, cidade.getIdCidade());
-            ps.setString(2, cidade.getNome());
-            ps.setInt(3, cidade.getCodigoIBGE());
-            ps.setInt(4, cidade.getFkEstado());
+            //ps.setInt(1, cidade.getIdCidade());
+            ps.setString(1, cidade.getNome());
+            ps.setInt(2, cidade.getCodigoIBGE());
+            ps.setInt(3, cidade.getFkEstado());
             r = ps.executeUpdate();
         }
         return r;
